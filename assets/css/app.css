@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    min-height: 100vh;
+    position: relative;
+}
+
+.login-form,
+.registration-form {
+    backdrop-filter: blur(35px);
+    color: rgb(255, 255, 255);
+    padding: 40px;
+    width: 500px;
+    border: 2px solid;
+    border-radius: 10px;
+}
+
+.switch-form-link {
+    text-decoration: underline;
+    cursor: pointer;
+    color: rgb(100, 100, 200);
+    margin-left: 6px;
+}
+
+.switch-form-link-register {
+    text-decoration: underline;
+    cursor: pointer;
+    color: rgb(100, 100, 200);
+    margin-left: 1px;
+}
+
+#register {
+    margin-top: 1rem;
+}
+
+#forgot {
+    margin-bottom: 1rem;
+}
+
+.verification-form {
+    backdrop-filter: blur(9px);
+    color: rgb(255, 255, 255);
+    padding: 40px;
+    width: 500px;
+    border: 2px solid;
+    border-radius: 10px;
+}
+
+.content {
+    backdrop-filter: blur(77px);
+    color: rgb(255, 255, 255);
+    border: 2px solid;
+    border-radius: 10px;
+}
+
+/* .card-title { */
+/* margin-bottom: 3.75rem;
+        } */
+h5.card-title {
+    color: black;
+    font-size: 2rem;
+}
+
+.table {
+    color: rgb(255, 255, 255) !important;
+}
+
+td button {
+    font-size: 20px;
+    width: 30px;
+}
+
+.card-text {
+    text-align: justify;
+}

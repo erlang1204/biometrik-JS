@@ -1,0 +1,14 @@
+[08-Aug-2024 04:18:04 UTC] PHP Warning:  Undefined array key "username" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/verification.php on line 73
+[08-Aug-2024 04:45:12 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Aes::encrypt() in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 26
+[08-Aug-2024 04:46:29 UTC] PHP Warning:  Undefined array key "username" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 16
+[08-Aug-2024 04:46:29 UTC] PHP Warning:  Undefined array key "contact_number" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 17
+[08-Aug-2024 04:46:29 UTC] PHP Warning:  Undefined array key "email" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 18
+[08-Aug-2024 04:46:29 UTC] PHP Warning:  Undefined array key "name" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 19
+[08-Aug-2024 04:46:29 UTC] PHP Warning:  Undefined array key "password" in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 23
+[08-Aug-2024 04:46:29 UTC] PHP Fatal error:  Uncaught Error: Call to undefined method Aes::encrypt() in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php:26
+Stack trace:
+#0 {main}
+  thrown in /home/jakapage/public_html/psikotes-simetri.my.id/modules/auth/register.php on line 26
