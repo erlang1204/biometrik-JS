@@ -109,7 +109,7 @@ $currentUserName = $_SESSION['username'];
             for (let i = 1; i <= 5; i++) {
                 try {
                 const img = await faceapi.fetchImage(
-                    `/test/dataset/${currentUserName}/${currentUserName}_${i}.png`
+                    `/dataset/${currentUserName}/${currentUserName}_${i}.png`
                 );
 
                 // deteksi wajah pada masing-masing 5 gambar. 

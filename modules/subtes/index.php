@@ -5,6 +5,11 @@ require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
 require __DIR__ . '/../../libs/aes.php';
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../');
+$dotenv->load();
+
 if (!isset($_SESSION['user_verified'])) {
     if (!isset($_SESSION['user_id'])) {
         header("Location: " . BASE_URL . "");
@@ -457,7 +462,7 @@ document.addEventListener("DOMContentLoaded", () => {
             for (let i = 1; i <= 5; i++) {
         try {
           const img = await faceapi.fetchImage(
-             `/test/dataset/${currentUserName}/${currentUserName}_${i}.png`
+             `/dataset/${currentUserName}/${currentUserName}_${i}.png`
           );
           const detections = await faceapi
             .detectSingleFace(img)
@@ -503,7 +508,7 @@ document.addEventListener("DOMContentLoaded", () => {
         webcamStarted = true;
     }
 
-    const modelPath = "https://192.168.1.153:4434/test/models/";
+    const modelPath = "<?= rtrim($_ENV['APP_URL'], '/') ?>/models/";
     await faceapi.nets.tinyFaceDetector.loadFromUri(modelPath);
     await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
     await faceapi.nets.faceRecognitionNet.loadFromUri(modelPath);
@@ -512,7 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const labeledDescriptors = [];
         for (let i = 1; i <= 5; i++) {
             try {
-                const img = await faceapi.fetchImage(`/test/dataset/${currentUserName}/${currentUserName}_${i}.png`);
+                const img = await faceapi.fetchImage(`/dataset/${currentUserName}/${currentUserName}_${i}.png`);
                 const detection = await faceapi
                     .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
