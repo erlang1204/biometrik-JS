@@ -210,7 +210,7 @@ require __DIR__ . '/includes/header.php';
             el.style.display = "none";
             resolve();
           }
-        }, 100);
+        }, 1000);
       });
     }
 

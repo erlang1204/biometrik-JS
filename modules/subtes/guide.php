@@ -53,7 +53,7 @@ $check_finished_test = $check_finished_test->rowCount();
         <div class="card" style="width: 30rem; display: flex; align-items: center;background: rgba(255,255,255,0.5)">
 
             <div class="card-body">
-                <h5 class="card-title" style="color-text: black; display: flex; justify-content: center; ">CFIT</h5>
+                <h5 class="card-title" style="color: black; display: flex; justify-content: center; ">CFIT</h5>
                 <p class="card-text" style="color: black;">"Tugas anda adalah mengisi kotak yang masih kosong sesuai
                     dengan pilihan yang tersedia. Perlu diingat bahwa setiap gambar pada kotak tersebut memiliki pola
                     tertentu. Anda perlu mengetahui pola tersebut untuk menjawab soal. Anda diwajibkan untuk memilih
