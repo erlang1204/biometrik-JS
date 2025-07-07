@@ -3,3 +3,6 @@
 /bayu
 /env
 /vendor
+.env
+.env.*
+!.env.example
