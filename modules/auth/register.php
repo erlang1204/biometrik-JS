@@ -23,22 +23,23 @@ try {
     $password = $_POST['password'];
     $role = "user";
 
-    // Upload Gambar
-    $uploadedFiles = uploadMultipleImages($name);
-    if (!$uploadedFiles) {
-        $_SESSION['register_errors'] = "Gagal mengunggah gambar.";
-        header("Location: index.php");
-        exit;
-    }
-
-    $imagesJson = json_encode($uploadedFiles);
-
-    // Enkripsi Password
-    $encryptedPassword = encryptPassword($password);
-
     $conn->beginTransaction();
 
     if (!isUsernameExists($conn, $username)) {
+
+        // Upload Gambar
+        $uploadedFiles = uploadMultipleImages($name);
+        if (!$uploadedFiles) {
+            $_SESSION['register_errors'] = "Gagal mengunggah gambar.";
+            header("Location: index.php");
+            exit;
+        }
+
+        $imagesJson = json_encode($uploadedFiles);
+
+        // Enkripsi Password
+        $encryptedPassword = encryptPassword($password);
+        
         $verification_code = rand(100000, 999999);
 
         insertNewUser($conn, [
