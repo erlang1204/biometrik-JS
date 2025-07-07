@@ -1,28 +1,5 @@
-# Abaikan semua file .rar dan .sql
 *.rar
 *.sql
-
-# Abaikan folder /bayu dan /env
 /bayu
 /env
-
-# Abaikan isi dari dataset dan dataset_ujian
-dataset/*
-dataset_ujian/*
-
-# Abaikan isi folder uploads
-uploads/*
-!uploads/.gitkeep
-!uploads/before_enkrip/
-!uploads/after_enkrip/
-
-# Abaikan semua isi dalam before_enkrip dan after_enkrip
-uploads/before_enkrip/*
-uploads/after_enkrip/*
-
-# Tapi jangan abaikan .gitkeep dalam masing-masing
-!uploads/before_enkrip/.gitkeep
-!uploads/after_enkrip/.gitkeep
-
-# Abaikan vendor folder
-/vendor/
+/vendor
