@@ -16,11 +16,13 @@ use PHPMailer\PHPMailer\Exception;
 
 $user_id = $_POST['user_id'];
 
+
 // Ambil data pengguna
 $stmt = $conn->prepare("SELECT * FROM `tbl_user` WHERE `id` = :id LIMIT 1");
 $stmt->bindParam(':id', $user_id, PDO::PARAM_INT);
 $stmt->execute();
 $data_user = $stmt->fetch(PDO::FETCH_ASSOC);
+
 
 // Ambil jawaban pengguna
 $stmt = $conn->prepare("SELECT * FROM `tbl_jawaban` WHERE `user_id` = :id ORDER BY CAST(soal_id AS UNSIGNED)");
@@ -41,6 +43,7 @@ if ($simpan_hasil_pdf['status']) {
     if ($enkripsi_file_pdf['status']) {
         // Kirim hasil ke user
         $kirim_hasil_user = kirimHasilUser($data_user, $enkripsi_file_pdf['data']);
+
         if ($kirim_hasil_user['status']) {
             echo "<script>
                     alert('Berhasil ke kirim');
@@ -130,6 +133,7 @@ function kirimHasilUser($data_user, $file_enkripsi)
         'message' => 'Errorrrrrrrrr'
     ];
 
+    
     if (file_exists($file_enkripsi)) {
         // Buat dan simpan PDF dari hasil tes
         $htmlContent = '<html>

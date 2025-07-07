@@ -62,8 +62,9 @@
                         <td>
                             <div class="d-flex justify-content-center align-items-center" style="gap: 4px;">
                                 <button id="sendbtn" style="width: 40px; height: 40px; font-size: 22px; line-height: 22px; padding: 2px;" class="btn bg-info text-white" onclick="send_otp('<?php echo $email; ?>', <?php echo $userID; ?>)" title="Send OTP">&#9993;</button>
-                                <button id="deleteBtn" style="width: 40px; height: 40px; font-size: 22px; line-height: 22px; padding: 2px;" class="btn bg-danger text-white" onclick="delete_user(<?php echo $userID ?>)" title="Delete User">&#128465;</button>
+                                <button id="deleteBtn" style="width: 40px; height: 40px; font-size: 22px; line-height: 22px; padding: 2px;" class="btn bg-danger text-white" onclick="delete_user(<?php echo $userID ?>)" title="Delete User">&#128465;</button> 
                                 <a title="Cek Hasil" style="width: 40px; height: 40px; font-size: 22px; line-height: 32px; padding: 2px;" class="btn bg-white" href="<?= BASE_URL; ?>/modules/admin/cek-hasil.php?id=<?= $userID ?>">&#128065;</a>
+                                <!-- <a title="Cek Foto" style="width: 40px; height: 40px; font-size: 22px; line-height: 32px; padding: 2px;" class="btn bg-white" href="<?= BASE_URL; ?>/modules/admin/cek-Foto.php?id=<?= $userID ?>">&#x1F4F7;</a> -->
                             </div>
                         </td>
                     </tr>

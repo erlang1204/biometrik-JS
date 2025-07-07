@@ -8,6 +8,7 @@ require __DIR__ . '/../../includes/functions.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = sanitizeInput($_POST['username']);
+    var_dump($username);
     $verification_code = $_POST['verification_code'];
 
     if (!empty($verification_code)) {

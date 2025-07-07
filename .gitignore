@@ -1,0 +1,15 @@
+*.rar
+/bayu
+dataset/*
+dataset_ujian/*
+/env
+uploads/*
+!uploads/.gitkeep
+!uploads/before_enkrip/
+!uploads/after_enkrip/
+uploads/before_enkrip/**
+uploads/after_enkrip/**
+!uploads/before_enkrip/.gitkeep
+!uploads/after_enkrip/.gitkeep
+/vendor
+*.sql
