@@ -96,17 +96,39 @@ function simpanGambarReturnPath($inputName, $folderTujuan = 'uploads/', $namaGam
     $file = $_FILES[$inputName];
     $extValid = ['jpg', 'jpeg', 'png', 'gif'];
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    $namaBaru = $namaGambar . '.' . $ext;
-    $fullPath = $folderTujuan . '/' . $namaBaru;
-
     if (!in_array($ext, $extValid)) return false;
     if ($file['size'] > ($maxSizeMB * 1024 * 1024)) return false;
     if ($file['error'] !== 0) return false;
 
-    if (!is_dir($folderTujuan)) mkdir($folderTujuan, 0755, true);
-    if (!move_uploaded_file($file['tmp_name'], $fullPath)) return false;
+    // Ubah nama file jadi lowercase dan berekstensi .png
+    $namaBaru = strtolower($namaGambar) . '.png';
+    $fullPath = rtrim($folderTujuan, '/') . '/' . $namaBaru;
 
-    return $fullPath;
+    if (!is_dir($folderTujuan)) mkdir($folderTujuan, 0755, true);
+
+    // Buka gambar sesuai format asli
+    switch ($ext) {
+        case 'jpg':
+        case 'jpeg':
+            $srcImage = imagecreatefromjpeg($file['tmp_name']);
+            break;
+        case 'png':
+            $srcImage = imagecreatefrompng($file['tmp_name']);
+            break;
+        case 'gif':
+            $srcImage = imagecreatefromgif($file['tmp_name']);
+            break;
+        default:
+            return false;
+    }
+
+    if (!$srcImage) return false;
+
+    // Simpan gambar dalam format PNG
+    $saved = imagepng($srcImage, $fullPath);
+    imagedestroy($srcImage);
+
+    return $saved ? $fullPath : false;
 }
 
 function encryptPassword($password) {
