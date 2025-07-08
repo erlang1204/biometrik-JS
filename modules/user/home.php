@@ -1,5 +1,4 @@
 <?php
-session_start();
 require __DIR__ . '/../../config/app.php';
 require __DIR__ . '/../../config/database.php';
 $check_finished_test = $conn->prepare("SELECT * FROM tbl_user WHERE id = ? AND finish_test = 1 LIMIT 1");
@@ -21,95 +20,98 @@ $currentUserName = $_SESSION['username'];
                         Anda telah selesai mengerjakan Test.
                     </div>
                 <?php else: ?>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <button id="startButton" class="btn btn-primary mb-2">Verifikasi Wajah</button>
-                    </div>
-                   
-                <?php endif; ?>
-             <div class="video-container mt-3" style="display: none;">
-                        <div class="video-wrapper">
-                            <div id="video-overlay">Menunggu verifikasi...</div>
-                            <!-- <video id="video" width="640" height="480" autoplay muted></video> -->
-                               <video id="video" width="640" height="450" autoplay></video>
-                <canvas id="overlay"></canvas>
-                        </div>    
+            </div>
+            <div class="d-flex justify-content-center">
+                <button id="startButton" class="btn btn-primary mb-2">Verifikasi Wajah</button>
             </div>
 
-            
+        <?php endif; ?>
+        <div class="video-container mt-3" style="display: none;">
+            <div class="video-wrapper">
+                <div id="video-overlay">Menunggu verifikasi...</div>
+                <!-- <video id="video" width="640" height="480" autoplay muted></video> -->
+                <video id="video" width="640" height="450" autoplay></video>
+                <canvas id="overlay"></canvas>
             </div>
         </div>
+
+
+        </div>
     </div>
+</div>
 
-    <!-- CSS untuk overlay -->
+<!-- CSS untuk overlay -->
 <style>
-.fixed-webcam {
-    position: fixed;
-    bottom: 10px;
-    left: 10px;
-    z-index: 9999;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 5px;
-    border-radius: 10px;
-}
+    .fixed-webcam {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        z-index: 9999;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 5px;
+        border-radius: 10px;
+    }
 
-.video-wrapper {
-    position: relative;
-    width: 300px;
-    height: 225px;
-}
+    .video-wrapper {
+        position: relative;
+        width: 300px;
+        height: 225px;
+    }
 
-#video {
-    position: absolute;
-    top: -9px;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
+    #video {
+        position: absolute;
+        top: -9px;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
 
-/* Tambahkan style ini untuk canvas hasil face-api */
-.video-wrapper canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    width: 100% !important;
-    height: 100% !important;
-}
-#video-overlay {
-    position: absolute;
-    top: -5px;
-    left: 10px;
-    z-index: 2;
-    color: white;
-    padding: 5px 10px;
-    background-color: rgba(0, 0, 0, 0.5);
-    font-weight: bold;
-    border-radius: 5px;
-}
+    /* Tambahkan style ini untuk canvas hasil face-api */
+    .video-wrapper canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    #video-overlay {
+        position: absolute;
+        top: -5px;
+        left: 10px;
+        z-index: 2;
+        color: white;
+        padding: 5px 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        font-weight: bold;
+        border-radius: 5px;
+    }
 </style>
 
-    <!-- Script face-api -->
-    <script defer src="../../assets/face_logics/face-api.min.js"></script>
-     
+<!-- Script face-api -->
+<script defer src="../../assets/face_logics/face-api.min.js"></script>
 
 
 
-    <script>
-        let webcamStarted = false;
-        const currentUserName = "<?= $currentUserName ?>";
-        const video = document.getElementById("video");
-        const overlayText = document.getElementById("video-overlay");
-  const videoContainer = document.querySelector(".video-container");
 
-        async function getLabeledFaceDescriptions() {
-            const labeledDescriptors = [];
+<script>
+    let webcamStarted = false;
+    const currentUserName = "<?= $currentUserName ?>";
+    const video = document.getElementById("video");
+    const overlayText = document.getElementById("video-overlay");
+    const videoContainer = document.querySelector(".video-container");
+    const baseURL = `<?php echo BASE_URL; ?>`
+    // console.log(baseURL)
 
-            // ambil 5 gambar dataset sesuai username
-            for (let i = 1; i <= 5; i++) {
-                try {
+    async function getLabeledFaceDescriptions() {
+        const labeledDescriptors = [];
+
+        // ambil 5 gambar dataset sesuai username
+        for (let i = 1; i <= 5; i++) {
+            try {
                 const img = await faceapi.fetchImage(
-                    `/dataset/${currentUserName}/${currentUserName}_${i}.png`
+                    `${baseURL}/dataset/${currentUserName}/${currentUserName}_${i}.png`
                 );
 
                 // deteksi wajah pada masing-masing 5 gambar. 
@@ -129,108 +131,115 @@ $currentUserName = $_SESSION['username'];
                 // semakin kecil nilai numerik, semakin mirip
                 // membandingkan wajah dengan euclideanDistance
 
-                
+
                 if (detections) {
                     console.log('ada');
                     labeledDescriptors.push(detections.descriptor);
-                    
+
                 } else {
                     console.log(`No face detected in/${i}.png`);
                 }
-                } catch (error) {
+            } catch (error) {
                 console.error(`Error processing ${i}.png:`, error);
-                }
             }
-                return labeledDescriptors;                
-            }
+        }
+        return labeledDescriptors;
+    }
 
-        // tampilkan webcam
-        function startWebcam() {
-            navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-                video.srcObject = stream;
-                document.querySelector(".video-container").style.display = "block";
-            }).catch((err) => {
-                console.error("Gagal mengakses webcam", err);
-            });
+    // tampilkan webcam
+    function startWebcam() {
+        navigator.mediaDevices.getUserMedia({
+            video: true
+        }).then((stream) => {
+            video.srcObject = stream;
+            document.querySelector(".video-container").style.display = "block";
+        }).catch((err) => {
+            console.error("Gagal mengakses webcam", err);
+        });
+    }
+
+    // klik tombol Verifikasi Wajah
+    document.getElementById("startButton").addEventListener("click", async () => {
+        if (!webcamStarted) {
+            startWebcam();
+            webcamStarted = true;
         }
 
-        // klik tombol Verifikasi Wajah
-        document.getElementById("startButton").addEventListener("click", async () => {
-            if (!webcamStarted) {
-                startWebcam();
-                webcamStarted = true;
-            }
+
+        // ssdMobilenetv1: Model deteksi wajah cepat & akurat.
+        // faceLandmark68Net: Deteksi 68 titik landmark wajah.
+        // faceRecognitionNet: Ekstraksi face descriptor (128 angka).
+        // load semua fungsi di bawah ke browser agar bisa pakai
+
+        await faceapi.nets.ssdMobilenetv1.loadFromUri('./models');
+        await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
+        await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
 
 
-            // ssdMobilenetv1: Model deteksi wajah cepat & akurat.
-            // faceLandmark68Net: Deteksi 68 titik landmark wajah.
-            // faceRecognitionNet: Ekstraksi face descriptor (128 angka).
-            // load semua fungsi di bawah ke browser agar bisa pakai
+        // simpan hasil array getLabeledFaceDescriptions (vektor wajah gambar) ke variabel baru
+        const labeledFaceDescriptors = await getLabeledFaceDescriptions();
 
-            await faceapi.nets.ssdMobilenetv1.loadFromUri('./models');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
+        // mencocokan hasil scan wajah pada video dengan gambar
+        // numerik atau kode wajah dan kode video dicocokan
+        // kalo > 0.6 berarti ga mirip
+        const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+
+        // Buat kanvas untuk menggambar kotak wajah dan label nama.
+        const canvas = faceapi.createCanvasFromMedia(video);
+        document.querySelector(".video-wrapper").appendChild(canvas);
+        console.log("Menambahkan canvas ke video-wrapper");
+
+        // custom ukuran canvas aja
+        const displaySize = {
+            width: video.width,
+            height: video.height
+        };
+        faceapi.matchDimensions(canvas, displaySize);
+        console.log('sampe sini ga sih');
 
 
-            // simpan hasil array getLabeledFaceDescriptions (vektor wajah gambar) ke variabel baru
-            const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+        const interval = setInterval(async () => {
+            const detections = await faceapi
+                .detectAllFaces(video)
+                .withFaceLandmarks()
+                .withFaceDescriptors();
 
-            // mencocokan hasil scan wajah pada video dengan gambar
-            // numerik atau kode wajah dan kode video dicocokan
-            // kalo > 0.6 berarti ga mirip
-            const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+            // deteksi wajah pada masing-masing video. 
+            // faceapi.detectAllFaces() digunakan untuk mendeteksi wajah pada video.
+            // Jika ditemukan wajah, faceapi akan menambahkan:
+            // Landmarks: Titik-titik penting seperti mata, hidung, mulut dari video
+            // Descriptor: Vektor wajah 128-dimensi dri video
 
-            // Buat kanvas untuk menggambar kotak wajah dan label nama.
-            const canvas = faceapi.createCanvasFromMedia(video);
-            document.querySelector(".video-wrapper").appendChild(canvas);
-            console.log("Menambahkan canvas ke video-wrapper");
+            const resizedDetections = faceapi.resizeResults(detections, displaySize);
+            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
 
-            // custom ukuran canvas aja
-            const displaySize = { width: video.width, height: video.height };
-            faceapi.matchDimensions(canvas, displaySize);
-            console.log('sampe sini ga sih');
-            
+            // Setiap wajah dalam frame dibandingkan dengan data yang sudah dikenali
+            // hasil berupa nama
+            // Wajah terdeteksi dari webcam.
+            // Descriptor-nya dihitung.
+            // Dicari descriptor mana yang paling mirip dari database.
+            // Jika jarak < 0.6, wajah dianggap cocok → label dikembalikan.
+            // Jika tidak, hasilnya 'unknown'.
 
-                const interval = setInterval(async () => {
-                    const detections = await faceapi
-                        .detectAllFaces(video)
-                        .withFaceLandmarks()
-                        .withFaceDescriptors();
+            const results = resizedDetections.map((d) => faceMatcher.findBestMatch(d.descriptor));
 
-                    // deteksi wajah pada masing-masing video. 
-                    // faceapi.detectAllFaces() digunakan untuk mendeteksi wajah pada video.
-                    // Jika ditemukan wajah, faceapi akan menambahkan:
-                    // Landmarks: Titik-titik penting seperti mata, hidung, mulut dari video
-                    // Descriptor: Vektor wajah 128-dimensi dri video
+            console.log(faceMatcher);
 
-                    const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                    canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+            // result: hasil pencocokan wajah ke-i.
+            // resizedDetections[i]: deteksi wajah ke-i yang sudah di-resize agar sesuai dengan ukuran video.
+            // resizedDetections[i].detection.box: koordinat posisi wajah (bounding box).
+            // faceapi.draw.DrawBox(): menggambar kotak di wajah, dengan label (nama).
+            // drawBox.draw(canvas): menggambar kotak pada elemen canvas.
+            // Jadi, ini adalah proses visualisasi wajah yang dikenali pada layar webcam.
 
-                    // Setiap wajah dalam frame dibandingkan dengan data yang sudah dikenali
-                    // hasil berupa nama
-                    // Wajah terdeteksi dari webcam.
-                    // Descriptor-nya dihitung.
-                    // Dicari descriptor mana yang paling mirip dari database.
-                    // Jika jarak < 0.6, wajah dianggap cocok → label dikembalikan.
-                    // Jika tidak, hasilnya 'unknown'.
+            results.forEach((result, i) => {
+                const box = resizedDetections[i].detection.box;
+                const drawBox = new faceapi.draw.DrawBox(box, {
+                    label: result.label
+                });
+                drawBox.draw(canvas);
+                console.log('ada ga');
 
-                    const results = resizedDetections.map((d) => faceMatcher.findBestMatch(d.descriptor));
-                    
-                    console.log(faceMatcher);
-
-                    // result: hasil pencocokan wajah ke-i.
-                    // resizedDetections[i]: deteksi wajah ke-i yang sudah di-resize agar sesuai dengan ukuran video.
-                    // resizedDetections[i].detection.box: koordinat posisi wajah (bounding box).
-                    // faceapi.draw.DrawBox(): menggambar kotak di wajah, dengan label (nama).
-                    // drawBox.draw(canvas): menggambar kotak pada elemen canvas.
-                    // Jadi, ini adalah proses visualisasi wajah yang dikenali pada layar webcam.
-
-                    results.forEach((result, i) => {
-                        const box = resizedDetections[i].detection.box;
-                        const drawBox = new faceapi.draw.DrawBox(box, { label: result.label });
-                        drawBox.draw(canvas);
-                        console.log('ada ga');
-                        
 
                 if (
                     result.label === 'person 1' ||
@@ -245,29 +254,27 @@ $currentUserName = $_SESSION['username'];
 
                     // Redirect setelah 2 detik (opsional, bisa langsung jika mau)
                     setTimeout(() => {
-                    // url masih belom update untuk lempar ke soal
-                    window.location.href = "<?= BASE_URL; ?>/modules/subtes/guide.php";
+                        // url masih belom update untuk lempar ke soal
+                        window.location.href = "<?= BASE_URL; ?>/modules/subtes/guide.php";
                     }, 2000);
-                    
-                }
-                    
-                else {
+
+                } else {
                     overlayText.innerText = "❌ Tidak dikenali";
                     overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
                     console.log('gaada');
-                            
-                    }
-                    });
 
-                    if (results.length === 0) {
-                        overlayText.innerText = "Tidak ada wajah terdeteksi";
-                        overlayText.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-                        console.log('nah ini gaadaa yang terdetaksi');
-                        
-                    }
-                }, 500);
-            // });
-        });
-    </script>
- 
+                }
+            });
+
+            if (results.length === 0) {
+                overlayText.innerText = "Tidak ada wajah terdeteksi";
+                overlayText.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                console.log('nah ini gaadaa yang terdetaksi');
+
+            }
+        }, 500);
+        // });
+    });
+</script>
+
 </div>
