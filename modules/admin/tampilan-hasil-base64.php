@@ -28,6 +28,18 @@ $warna_status = $nilai >= 5 ? "green" : "red";
 
 // Direktori foto
 $username = $data_user['username'];
+$foto_register_dir = realpath(__DIR__ . '/../../dataset/' . $username);
+$foto_ujian_dir    = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
+
+$foto_register = glob($foto_register_dir . "/*.{jpg,jpeg,png}", GLOB_BRACE);
+$foto_ujian    = glob($foto_ujian_dir . "/*.{jpg,jpeg,png}", GLOB_BRACE);
+
+// Fungsi helper untuk konversi ke base64
+function imgToBase64($path) {
+    $type = pathinfo($path, PATHINFO_EXTENSION);
+    $data = file_get_contents($path);
+    return 'data:image/' . $type . ';base64,' . base64_encode($data);
+}
 
 // HTML hasil
 $html = '
@@ -111,53 +123,30 @@ $html .= '
     <div class="nilai">Nilai Anda: ' . $nilai_bulat . '</div>
     <div class="status">Status: <strong>' . $status_lulus . '</strong></div>';
 
-$username = $data_user['username'];
-
 // Tampilkan foto register
 $html .= '<h3>Foto Register</h3><div class="foto-container">';
-
-$dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $username);
-$dataset_url_base = 'dataset/' . $username; // Pastikan folder ini bisa diakses lewat web
-
-if ($dataset_dir_register && is_dir($dataset_dir_register)) {
-    $foto_register = glob($dataset_dir_register . "/*.{jpg,jpeg,png}", GLOB_BRACE);
-
-    if (!empty($foto_register)) {
-        foreach ($foto_register as $foto_path) {
-            $html .= '<img src="file://' . $foto_path . '" style="width:100px; height:100px; object-fit:cover; margin:5px; border:1px solid #ccc;">';
-        }
-    } else {
-        $html .= '<p>Tidak ada foto register.</p>';
+if ($foto_register) {
+    foreach ($foto_register as $foto) {
+        $base64 = imgToBase64($foto);
+        $html .= '<img src="' . $base64 . '">';
     }
 } else {
-    $html .= '<p>Tidak ada foto register.</p>';
+    $html .= '<p>Tidak ada foto register</p>';
 }
-
 $html .= '</div>';
 
 // Tampilkan foto ujian
 $html .= '<h3>Foto Ujian</h3><div class="foto-container">';
-
-$dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
-$dataset_url_base = 'dataset_ujian/' . $username; // Pastikan folder ini bisa diakses via URL
-
-if ($dataset_dir_ujian && is_dir($dataset_dir_ujian)) {
-    $foto_ujian = glob($dataset_dir_ujian . "/*.{jpg,jpeg,png}", GLOB_BRACE);
-
-    if (!empty($foto_ujian)) {
-        foreach ($foto_ujian as $foto_path) {
-            $html .= '<img src="file://' . $foto_path . '" style="width:100px; height:100px; object-fit:cover; margin:5px; border:1px solid #ccc;">';
-        }
-    } else {
-        $html .= '<p>Tidak ada foto ujian.</p>';
+if ($foto_ujian) {
+    foreach ($foto_ujian as $foto) {
+        $base64 = imgToBase64($foto);
+        $html .= '<img src="' . $base64 . '">';
     }
 } else {
-    $html .= '<p>Tidak ada foto ujian.</p>';
+    $html .= '<p>Tidak ada foto ujian</p>';
 }
-
-$html .= '</div>';
-
-'</body>
+$html .= '</div>
+</body>
 </html>';
 
 echo $html;

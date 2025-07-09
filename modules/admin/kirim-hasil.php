@@ -38,18 +38,14 @@ $jawaban = $stmt_kunci->fetchAll(PDO::FETCH_ASSOC);
 // Simpan file ke pdf (asli)
 $simpan_hasil_pdf = simpanHasilPDF($data_user, $answers, $jawaban);
 if ($simpan_hasil_pdf['status']) {
-    // Enkripsi file pdf
-    $enkripsi_file_pdf = enkripsiFilePDF($data_user, $simpan_hasil_pdf['data']);
-    if ($enkripsi_file_pdf['status']) {
-        // Kirim hasil ke user
-        $kirim_hasil_user = kirimHasilUser($data_user, $enkripsi_file_pdf['data']);
+    // Kirim hasil ke user
+    $kirim_hasil_user = kirimHasilUser($data_user, $simpan_hasil_pdf['data']);
 
-        if ($kirim_hasil_user['status']) {
-            echo "<script>
-                    alert('Berhasil ke kirim');
-                    window.location.href = '" . BASE_URL . "/modules/admin/cek-hasil.php?id=" . $user_id . "';
-            </script>";
-        }
+    if ($kirim_hasil_user['status']) {
+        echo "<script>
+                alert('Berhasil ke kirim');
+                window.location.href = '" . BASE_URL . "/modules/admin/cek-hasil.php?id=" . $user_id . "';
+        </script>";
     }
 }
 
@@ -59,6 +55,7 @@ function simpanHasilPDF($data_user, $answers, $jawaban)
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
     $options->set('isRemoteEnabled', true);
+    $options->setChroot(realpath(__DIR__ . '/../../'));
 
     // Membuat instance Dompdf
     $dompdf = new Dompdf($options);
@@ -118,11 +115,11 @@ function enkripsiFilePDF($data_user, $pathFileAsli)
     return $result;
 }
 
-function kirimHasilUser($data_user, $file_enkripsi)
+function kirimHasilUser($data_user, $fileName)
 {
     // OTP
     $otp = $data_user['verification_code'];
-    $file_enkripsi = "../../uploads/after-enkrip/$file_enkripsi";
+    $filePath = "../../uploads/before-enkrip/$fileName";
 
     $username = $data_user['username'];
     $email = $data_user['email'];
@@ -134,7 +131,7 @@ function kirimHasilUser($data_user, $file_enkripsi)
     ];
 
     
-    if (file_exists($file_enkripsi)) {
+    if (file_exists($filePath)) {
         // Buat dan simpan PDF dari hasil tes
         $htmlContent = '<html>
                             <body>
@@ -184,7 +181,7 @@ function kirimHasilUser($data_user, $file_enkripsi)
             $mail->addAddress($email, $username);
 
             // Attachments
-            $mail->addAttachment($file_enkripsi);
+            $mail->addAttachment($filePath);
 
             // Content
             $mail->isHTML(true);

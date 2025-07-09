@@ -3,7 +3,6 @@ session_start();
 require __DIR__ . '/../../config/app.php';
 require __DIR__ . '/../../config/database.php';
 require __DIR__ . '/../../includes/functions.php';
-require __DIR__ . '/../../libs/aes.php';
 
 if (!isset($_SESSION['user_id'])) {
     if ($_SESSION['role'] != "admin") {
@@ -82,7 +81,7 @@ require __DIR__ . '/../../includes/navbar.php';
                         <td><?= $soal; ?></td>
                         <td><?= $jawaban; ?></td>
                     </tr>
-                    
+
                 <?php
                 }
                 ?>
@@ -115,98 +114,98 @@ require __DIR__ . '/../../includes/navbar.php';
         }
 
         // Hitung nilai akhir dalam persentase
-$nilai_persen = ($nilai / $total_soal) * 100;
-$nilai_bulat = round($nilai_persen);
+        $nilai_persen = ($nilai / $total_soal) * 100;
+        $nilai_bulat = round($nilai_persen);
 
-// Tentukan status kelulusan
-$status_lulus = $nilai >= 6 ? "LULUS" : "TIDAK LULUS";
-$badge_color = $nilai >= 6 ? "success" : "danger";
+        // Tentukan status kelulusan
+        $status_lulus = $nilai >= 6 ? "LULUS" : "TIDAK LULUS";
+        $badge_color = $nilai >= 6 ? "success" : "danger";
 
-// Tampilkan hasil nilai & status
-echo '
-<div class="mt-4 mb-4" style="color: #fff">
-    <div class="card-body text-center">
-        <h4 class="mb-3">Nilai Akhir Anda</h4>
-        <div class="mb-3">
-            <span class="badge bg-primary" style="font-size: 2rem; padding: 20px 30px;">' . $nilai_bulat .'</span>
-        </div>
-        <div>
-            <span class="badge bg-' . $badge_color . '" style="font-size: 1.2rem; padding: 10px 20px;">
-                ' . $status_lulus . '
-            </span>
-        </div>
-        <p class="mt-2">Jawaban Benar: ' . $nilai . ' dari ' . $total_soal . ' soal</p>
-    </div>
-</div>';
-
-        // Fungsi kompres dan encode base64
-        function compressToBase64($path, $width = 200, $quality = 60) {
-            $info = getimagesize($path);
-            $mime = $info['mime'];
-
-            switch ($mime) {
-                case 'image/jpeg':
-                    $src = imagecreatefromjpeg($path);
-                    break;
-                case 'image/png':
-                    $src = imagecreatefrompng($path);
-                    break;
-                default:
-                    return '';
-            }
-
-            $old_width = imagesx($src);
-            $old_height = imagesy($src);
-            $ratio = $old_height / $old_width;
-            $new_height = (int) round($width * $ratio);
-
-            $dst = imagecreatetruecolor($width, $new_height);
-            imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $new_height, $old_width, $old_height);
-
-            ob_start();
-            imagejpeg($dst, null, $quality);
-            $data = ob_get_clean();
-
-            imagedestroy($src);
-            imagedestroy($dst);
-
-            return 'data:image/jpeg;base64,' . base64_encode($data);
-        }
+        // Tampilkan hasil nilai & status
+        echo '
+                <div class="mt-4 mb-4" style="color: #fff">
+                    <div class="card-body text-center">
+                        <h4 class="mb-3">Nilai Akhir Anda</h4>
+                        <div class="mb-3">
+                            <span class="badge bg-primary" style="font-size: 2rem; padding: 20px 30px;">' . $nilai_bulat . '</span>
+                        </div>
+                        <div>
+                            <span class="badge bg-' . $badge_color . '" style="font-size: 1.2rem; padding: 10px 20px;">
+                                ' . $status_lulus . '
+                            </span>
+                        </div>
+                        <p class="mt-2">Jawaban Benar: ' . $nilai . ' dari ' . $total_soal . ' soal</p>
+                    </div>
+                </div>';
 
         echo "<div class='mt-4'>";
 
         // --- FOTO REGISTER ---
+        $username = $user['username'];
         $dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $username);
-        $fotos_register = glob($dataset_dir_register . "/*.{jpg,jpeg,png}", GLOB_BRACE);
+        $dataset_url_base = 'dataset/' . $username; // Pastikan folder ini bisa diakses lewat web
 
-        if ($fotos_register) {
-            echo "<h4 style='color:white;'>Foto Register:</h4>";
-            echo "<div style='display: flex; flex-wrap: wrap; gap: 10px;'>";
-            foreach ($fotos_register as $foto) {
-                $imgBase64 = compressToBase64($foto, 200, 60);
-                echo "<img src='{$imgBase64}' style='width: 120px; height: 120px; object-fit: cover; border: 2px solid #fff; border-radius: 8px; cursor: pointer;' onclick='showImage(\"{$imgBase64}\")'>";
+        if ($dataset_dir_register && is_dir($dataset_dir_register)) {
+            $fotos_register = glob($dataset_dir_register . "/*.{jpg,jpeg,png}", GLOB_BRACE);
+
+            if (!empty($fotos_register)) {
+                echo "<h4 style='color:white;'>Foto Register:</h4>";
+                echo "<div style='display: flex; flex-wrap: wrap; gap: 10px;'>";
+
+                foreach ($fotos_register as $index => $foto_path) {
+                    $filename = basename($foto_path);
+                    $imgUrl = BASE_URL . '/' . $dataset_url_base . '/' . rawurlencode($filename); // Encode untuk URL aman
+
+                    echo "<img 
+                        src='{$imgUrl}' 
+                        alt='{$filename}' 
+                        title='{$filename}' 
+                        style='width: 120px; height: 120px; object-fit: cover; border: 2px solid #fff; border-radius: 8px; cursor: pointer;' 
+                        onclick='showImage(\"{$imgUrl}\")'>";
+                }
+
+                echo "</div><br>";
+            } else {
+                echo "<p style='color:white;'>Tidak ada foto register ditemukan.</p>";
             }
-            echo "</div><br>";
         } else {
             echo "<p style='color:white;'>Tidak ada foto register ditemukan.</p>";
         }
 
-        // --- FOTO UJIAN ---
-        $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
-        $fotos_ujian = glob($dataset_dir_ujian . "/*.{jpg,jpeg,png}", GLOB_BRACE);
 
-        if ($fotos_ujian) {
-            echo "<h4 style='color:white;'>Foto Ujian:</h4>";
-            echo "<div style='display: flex; flex-wrap: wrap; gap: 10px;'>";
-           foreach ($fotos_ujian as $foto) {
-    $imgBase64 = compressToBase64($foto, 200, 60);
-    echo "<img src='{$imgBase64}' style='width: 120px; height: 120px; object-fit: cover; border: 2px solid #fff; border-radius: 8px; cursor: pointer;' onclick='showImage(\"{$imgBase64}\")'>";
-}
-echo "</div><br>";
-} else {
-    echo "<p style='color:white;'>Tidak ada foto ujian ditemukan.</p>";
-}
-echo "</div>";
+
+        // --- FOTO UJIAN ---
+        $username = $user['username'];
+        $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
+        $dataset_url_base = 'dataset_ujian/' . $username; // Pastikan folder ini bisa diakses lewat web
+
+        if ($dataset_dir_ujian && is_dir($dataset_dir_ujian)) {
+            $fotos_ujian = glob($dataset_dir_ujian . "/*.{jpg,jpeg,png}", GLOB_BRACE);
+
+            if (!empty($fotos_ujian)) {
+                echo "<h4 style='color:white;'>Foto Ujian:</h4>";
+                echo "<div style='display: flex; flex-wrap: wrap; gap: 10px;'>";
+
+                foreach ($fotos_ujian as $index => $foto_path) {
+                    $filename = basename($foto_path);
+                    $imgUrl = BASE_URL . '/' . $dataset_url_base . '/' . rawurlencode($filename); // Encode untuk URL aman
+
+                    echo "<img 
+                        src='{$imgUrl}' 
+                        alt='{$filename}' 
+                        title='{$filename}' 
+                        style='width: 120px; height: 120px; object-fit: cover; border: 2px solid #fff; border-radius: 8px; cursor: pointer;' 
+                        onclick='showImage(\"{$imgUrl}\")'>";
+                }
+
+                echo "</div><br>";
+            } else {
+                echo "<p style='color:white;'>Tidak ada foto ujian ditemukan.</p>";
+            }
+        } else {
+            echo "<p style='color:white;'>Tidak ada foto ujian ditemukan.</p>";
+        }
+        echo "</div>";
 
         ?>
         <form method="POST" action="<?= BASE_URL; ?>/modules/admin/kirim-hasil.php">
@@ -217,21 +216,21 @@ echo "</div>";
 </div>
 <!-- Modal Preview Gambar -->
 <div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark">
-      <div class="modal-body text-center">
-        <img id="modalImage" src="" class="img-fluid rounded" alt="Preview" style="max-height: 80vh;">
-      </div>
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark">
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid rounded" alt="Preview" style="max-height: 80vh;">
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <script>
-  function showImage(src) {
-    const modalImg = document.getElementById("modalImage");
-    modalImg.src = src;
-    new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
-  }
+    function showImage(src) {
+        const modalImg = document.getElementById("modalImage");
+        modalImg.src = src;
+        new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+    }
 </script>
 
 <?php
