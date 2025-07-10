@@ -112,12 +112,15 @@ $html .= '
     <div class="status">Status: <strong>' . $status_lulus . '</strong></div>';
 
 $username = $data_user['username'];
+$name = $data_user['name'];
+$id = $data_user['id'];
+$folderName = $name.'_'.$id;
 
 // Tampilkan foto register
 $html .= '<h3>Foto Register</h3><div class="foto-container">';
 
-$dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $username);
-$dataset_url_base = 'dataset/' . $username; // Pastikan folder ini bisa diakses lewat web
+$dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $folderName);
+$dataset_url_base = 'dataset/' . $folderName; // Pastikan folder ini bisa diakses lewat web
 
 if ($dataset_dir_register && is_dir($dataset_dir_register)) {
     $foto_register = glob($dataset_dir_register . "/*.{jpg,jpeg,png}", GLOB_BRACE);
@@ -138,8 +141,8 @@ $html .= '</div>';
 // Tampilkan foto ujian
 $html .= '<h3>Foto Ujian</h3><div class="foto-container">';
 
-$dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
-$dataset_url_base = 'dataset_ujian/' . $username; // Pastikan folder ini bisa diakses via URL
+$dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $folderName);
+$dataset_url_base = 'dataset_ujian/' . $folderName; // Pastikan folder ini bisa diakses via URL
 
 if ($dataset_dir_ujian && is_dir($dataset_dir_ujian)) {
     $foto_ujian = glob($dataset_dir_ujian . "/*.{jpg,jpeg,png}", GLOB_BRACE);

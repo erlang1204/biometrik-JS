@@ -34,7 +34,8 @@ require __DIR__ . '/../../includes/navbar.php';
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($user) {
-
+                $id = $user['id'];
+                $name = $user['name'];
                 $username = $user['username'];
                 $email = $user['email'];
                 $contactNumber = $user['contact_number'];
@@ -141,9 +142,10 @@ require __DIR__ . '/../../includes/navbar.php';
         echo "<div class='mt-4'>";
 
         // --- FOTO REGISTER ---
-        $username = $user['username'];
-        $dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $username);
-        $dataset_url_base = 'dataset/' . $username; // Pastikan folder ini bisa diakses lewat web
+        $name = $user['name'];
+        $folderName = $name.'_'.$id;
+        $dataset_dir_register = realpath(__DIR__ . '/../../dataset/' . $folderName);
+        $dataset_url_base = 'dataset/' . $folderName; // Pastikan folder ini bisa diakses lewat web
 
         if ($dataset_dir_register && is_dir($dataset_dir_register)) {
             $fotos_register = glob($dataset_dir_register . "/*.{jpg,jpeg,png}", GLOB_BRACE);
@@ -176,8 +178,10 @@ require __DIR__ . '/../../includes/navbar.php';
 
         // --- FOTO UJIAN ---
         $username = $user['username'];
-        $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $username);
-        $dataset_url_base = 'dataset_ujian/' . $username; // Pastikan folder ini bisa diakses lewat web
+        $name = $user['name'];
+        $folderName = $name.'_'.$id;
+        $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $folderName);
+        $dataset_url_base = 'dataset_ujian/' . $folderName; // Pastikan folder ini bisa diakses lewat web
 
         if ($dataset_dir_ujian && is_dir($dataset_dir_ujian)) {
             $fotos_ujian = glob($dataset_dir_ujian . "/*.{jpg,jpeg,png}", GLOB_BRACE);

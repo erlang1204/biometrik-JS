@@ -5,6 +5,8 @@ $check_finished_test = $conn->prepare("SELECT * FROM tbl_user WHERE id = ? AND f
 $check_finished_test->execute([$_SESSION['user_id']]);
 $check_finished_test = $check_finished_test->rowCount();
 $currentUserName = $_SESSION['username'];
+$currentName = $_SESSION['name'];
+$currentUserId = $_SESSION['user_id'];
 ?>
 
 <div class="d-flex justify-content-center align-items-center w-100" style="max-width: 800px; margin: 11px auto">
@@ -98,6 +100,8 @@ $currentUserName = $_SESSION['username'];
 <script>
     let webcamStarted = false;
     const currentUserName = "<?= $currentUserName ?>";
+    const currentName = "<?= $currentName ?>";
+    const currentUserId = "<?= $currentUserId ?>";
     const video = document.getElementById("video");
     const overlayText = document.getElementById("video-overlay");
     const videoContainer = document.querySelector(".video-container");
@@ -110,8 +114,8 @@ $currentUserName = $_SESSION['username'];
         // ambil 5 gambar dataset sesuai username
         for (let i = 1; i <= 5; i++) {
             try {
-                const img = await faceapi.fetchImage(
-                    `${baseURL}/dataset/${currentUserName}/${currentUserName}_${i}.png`
+               const img = await faceapi.fetchImage(
+                    `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
                 );
 
                 // deteksi wajah pada masing-masing 5 gambar. 

@@ -13,8 +13,12 @@ if (!isset($data['image']) || !isset($data['username'])) {
 
 $imageData = $data['image'];
 $username = preg_replace('/[^a-zA-Z0-9_]/', '', $data['username']); // sanitize nama folder
+$name = preg_replace('/[^a-zA-Z0-9_]/', '', $data['name']); // sanitize nama folder
+$id = preg_replace('/[^a-zA-Z0-9_]/', '', $data['id']); // sanitize nama folder
+$folderName = $name.'_'.$id;
 
-$folder = dirname(__DIR__,2) . "/dataset_ujian/$username";
+
+$folder = dirname(__DIR__,2) . "/dataset_ujian/$folderName";
 if (!file_exists($folder)) {
     if (!mkdir($folder, 0777, true)) {
         echo json_encode(["success" => false, "message" => "Gagal membuat folder."]);
@@ -38,7 +42,8 @@ if ($imageDecoded === false) {
 }
 
 // Tentukan path file
-$filePath = "$folder/{$username}_$fileCount.png";
+$filePath = "$folder/{$name}_$fileCount.png";
+
 
 // Simpan file
 if (file_put_contents($filePath, $imageDecoded)) {

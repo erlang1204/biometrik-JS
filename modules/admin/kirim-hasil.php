@@ -120,7 +120,7 @@ function kirimHasilUser($data_user, $fileName)
     // OTP
     $otp = $data_user['verification_code'];
     $filePath = "../../uploads/before-enkrip/$fileName";
-
+ 
     $username = $data_user['username'];
     $email = $data_user['email'];
     $contactNumber = $data_user['contact_number'];

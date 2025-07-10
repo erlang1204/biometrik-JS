@@ -20,6 +20,9 @@ $stmt->bindParam(':id', $get_id_soal, PDO::PARAM_INT);
 $stmt->execute();
 
 $currentUserName = $_SESSION['username'];
+$currentName = $_SESSION['name'];
+$currentUserId = $_SESSION['user_id'];
+
 
 
 $data_soal = $stmt->fetch(PDO::FETCH_ASSOC); // Mengambil baris sebagai array asosiatif
@@ -327,7 +330,7 @@ require __DIR__ . '/../../includes/navbar.php';
                     console.log("bisa klik next nih");
                     console.log('soal now :', currentSoal);
 
-                    overlayText.innerText = "✅ Halo, " + currentUserName;
+                    overlayText.innerText = "✅ Halo, " + currentName;
                     overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
                     overlayText.style.display = "block";
 
@@ -381,7 +384,9 @@ require __DIR__ . '/../../includes/navbar.php';
                             },
                             body: JSON.stringify({
                                 image: imageBase64,
-                                username: currentUserName
+                                username: currentUserName,
+                                name: currentName,
+                                id: currentUserId,
                             })
                         });
 
@@ -451,6 +456,8 @@ require __DIR__ . '/../../includes/navbar.php';
     <script>
         let webcamStarted = false;
         const currentUserName = "<?= $currentUserName ?>";
+        const currentName = "<?= $currentName ?>";
+        const currentUserId = "<?= $currentUserId ?>";
         const video = document.getElementById("video");
         const overlayText = document.getElementById("video-overlay");
         const videoContainer = document.querySelector(".video-container");
@@ -461,8 +468,9 @@ require __DIR__ . '/../../includes/navbar.php';
             for (let i = 1; i <= 5; i++) {
                 try {
                     const img = await faceapi.fetchImage(
-                        `${baseURL}/dataset/${currentUserName}/${currentUserName}_${i}.png`
+                        `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
                     );
+
                     const detections = await faceapi
                         .detectSingleFace(img)
                         .withFaceLandmarks()
@@ -518,7 +526,10 @@ require __DIR__ . '/../../includes/navbar.php';
                 const labeledDescriptors = [];
                 for (let i = 1; i <= 5; i++) {
                     try {
-                        const img = await faceapi.fetchImage(`${baseURL}/dataset/${currentUserName}/${currentUserName}_${i}.png`);
+                        const img = await faceapi.fetchImage(
+    `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
+);
+
                         const detection = await faceapi
                             .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
                             .withFaceLandmarks()
@@ -577,8 +588,8 @@ require __DIR__ . '/../../includes/navbar.php';
                     });
                     drawBox.draw(canvas);
 
-                    if (result.label.includes("person") || result.label === currentUserName) {
-                        overlayText.innerText = `✅ Halo, ${currentUserName} (${percentage}%)`;
+                    if (result.label.includes("person") || result.label === currentName) {
+                        overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
                         overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
                         overlayText.style.display = "block";
                     } else {

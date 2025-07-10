@@ -22,13 +22,29 @@ try {
     $name = sanitizeInput($_POST['name']);
     $password = $_POST['password'];
     $role = "user";
+     $verification_code = rand(100000, 999999);
+    $encryptedPassword = encryptPassword($password);
+    
 
     $conn->beginTransaction();
 
     if (!isUsernameExists($conn, $username)) {
 
+         // Sementara insert user dummy (dengan gambar kosong) agar dapat ID
+        $data = [
+            'name' => $name,
+            'username' => $username,
+            'contact_number' => $contact_number,
+            'email' => $email,
+            'password' => $encryptedPassword,
+            'verification_code' => $verification_code,
+            'role' => $role,
+            'studentImage' => ''
+        ];
+        
+        $id = insertNewUser($conn, $data);
         // Upload Gambar
-        $uploadedFiles = uploadMultipleImages($name);
+        $uploadedFiles = uploadMultipleImages($name,$id);
         if (!$uploadedFiles) {
             $_SESSION['register_errors'] = "Gagal mengunggah gambar.";
             header("Location: index.php");
@@ -42,17 +58,23 @@ try {
         
         $verification_code = rand(100000, 999999);
 
-        insertNewUser($conn, [
-            'name' => $name,
-            'username' => $username,
-            'contact_number' => $contact_number,
-            'email' => $email,
-            'password' => $encryptedPassword,
-            'verification_code' => $verification_code,
-            'role' => $role,
-            'studentImage' => $imagesJson
-        ]);
+        // insertNewUser($conn, [
+        //     'name' => $name,
+        //     'username' => $username,
+        //     'contact_number' => $contact_number,
+        //     'email' => $email,
+        //     'password' => $encryptedPassword,
+        //     'verification_code' => $verification_code,
+        //     'role' => $role,
+        //     'studentImage' => $imagesJson
+        // ]);
 
+         // Update record dengan path gambar setelah upload berhasil
+        // $stmt = $conn->prepare("UPDATE tbl_user SET studentImage = :studentImage WHERE id = :id");
+        // $stmt->execute([
+        //     ':studentImage' => $imagesJson,
+        //     ':id' => $id
+        // ]);
         sendVerificationEmail($email, $verification_code);
 
         $conn->commit();
@@ -72,8 +94,8 @@ try {
 
 // ===================== FUNGSI-FUNGSI ==========================
 
-function uploadMultipleImages($nama, $jumlah = 5) {
-    $folderTujuan = "../../dataset/{$nama}/";
+function uploadMultipleImages($nama, $id,$jumlah = 5) {
+    $folderTujuan = "../../dataset/{$nama}_{$id}/";
     $uploaded = [];
 
     for ($i = 1; $i <= $jumlah; $i++) {
@@ -159,7 +181,14 @@ function insertNewUser($conn, $data) {
         ':role' => $data['role'],
         ':studentImage' => $data['studentImage']
     ]);
+
+    return $conn->lastInsertId();
 }
+
+
+
+
+
 
 function sendVerificationEmail($toEmail, $code) {
     $mail = new PHPMailer(true);
