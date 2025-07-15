@@ -214,25 +214,35 @@ require __DIR__ . '/includes/header.php';
     }
 
     async function captureValidatedImage(video, index) {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(video, 0, 0);
-      const detection = await faceapi.detectSingleFace(canvas, new faceapi.TinyFaceDetectorOptions({
-        inputSize: 160
-      }));
-      if (!detection) return null;
-      return await new Promise((resolve) => {
-        canvas.toBlob((blob) => {
-          if (!blob) return resolve(null);
-          const file = new File([blob], `image_${index}.jpg`, {
-            type: "image/jpeg"
-          });
-          resolve(file);
-        }, "image/jpeg", 0.95);
-      });
-    }
+  const canvas = document.createElement("canvas");
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(video, 0, 0);
+
+  // Deteksi semua wajah
+  const detections = await faceapi.detectAllFaces(canvas, new faceapi.TinyFaceDetectorOptions({ inputSize: 160 }));
+
+  if (detections.length === 0) {
+    alert("❌ Tidak ada wajah terdeteksi. Coba lagi.");
+    return null;
+  }
+
+  if (detections.length > 1) {
+    alert("⚠️ Terdeteksi lebih dari 1 wajah. Pastikan hanya 1 orang di depan kamera.");
+    return null;
+  }
+
+  // Hanya 1 wajah → lanjut
+  return await new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      if (!blob) return resolve(null);
+      const file = new File([blob], `image_${index}.jpg`, { type: "image/jpeg" });
+      resolve(file);
+    }, "image/jpeg", 0.95);
+  });
+}
+
 
     function renderPreview(base64, index) {
       const container = document.getElementById("multiple-images");
