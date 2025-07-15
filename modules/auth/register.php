@@ -78,7 +78,7 @@ try {
         sendVerificationEmail($email, $verification_code);
 
         $conn->commit();
-        $_SESSION['register_user_success'] = "Register Successfully, please check your email.";
+        $_SESSION['register_user_success'] = "Register Successfully.";
     } else {
         $conn->rollBack();
         $_SESSION['register_user_exists'] = "User already exists.";

@@ -125,7 +125,7 @@ $currentUserId = $_SESSION['user_id'];
                 // Descriptor: Vektor wajah 128-dimensi
 
                 const detections = await faceapi
-                    .detectSingleFace(img)
+                    .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
                     .withFaceLandmarks()
                     .withFaceDescriptor();
 
@@ -170,12 +170,12 @@ $currentUserId = $_SESSION['user_id'];
         }
 
 
-        // ssdMobilenetv1: Model deteksi wajah cepat & akurat.
+        // tinyFaceDetector: Model deteksi wajah cepat & akurat.
         // faceLandmark68Net: Deteksi 68 titik landmark wajah.
         // faceRecognitionNet: Ekstraksi face descriptor (128 angka).
         // load semua fungsi di bawah ke browser agar bisa pakai
 
-        await faceapi.nets.ssdMobilenetv1.loadFromUri('./models');
+        await faceapi.nets.tinyFaceDetector.loadFromUri('./models');
         await faceapi.nets.faceLandmark68Net.loadFromUri('./models');
         await faceapi.nets.faceRecognitionNet.loadFromUri('./models');
 
@@ -204,7 +204,7 @@ $currentUserId = $_SESSION['user_id'];
 
         const interval = setInterval(async () => {
             const detections = await faceapi
-                .detectAllFaces(video)
+                .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
                 .withFaceLandmarks()
                 .withFaceDescriptors();
 

@@ -588,14 +588,15 @@ require __DIR__ . '/../../includes/navbar.php';
                     });
                     drawBox.draw(canvas);
 
-                    if (result.label.includes("person") || result.label === currentName) {
-                        overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
-                        overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
-                        overlayText.style.display = "block";
+                    if (result.label === "unknown" || percentage < 50) {
+    overlayText.innerText = `❌ Wajah Tidak Dikenali (${percentage}%)`;
+    overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+    showWarningNotification("Wajah Anda tidak dikenali. Pastikan Anda menghadap kamera dengan jelas.");
                     } else {
-                        overlayText.innerText = `❌ Tidak dikenali (${percentage}%)`;
-                        overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
-                    }
+    overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
+    overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+}
+
                 });
 
                 if (results.length === 0) {
@@ -607,6 +608,32 @@ require __DIR__ . '/../../includes/navbar.php';
         });
     </script>
 
+<script>
+function showWarningNotification(message) {
+    // Cegah notifikasi spam berulang
+    if (document.getElementById("warning-toast")) return;
+
+    const toast = document.createElement("div");
+    toast.id = "warning-toast";
+    toast.style.position = "fixed";
+    toast.style.bottom = "20px";
+    toast.style.right = "20px";
+    toast.style.zIndex = "99999";
+    toast.style.backgroundColor = "#ffc107";
+    toast.style.color = "#000";
+    toast.style.padding = "1rem 1.5rem";
+    toast.style.borderRadius = "8px";
+    toast.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
+    toast.style.fontWeight = "bold";
+    toast.innerText = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 5000); // 5 detik
+}
+</script>
 
 
     <script type="text/javascript">

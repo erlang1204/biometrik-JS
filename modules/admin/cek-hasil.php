@@ -177,10 +177,11 @@ require __DIR__ . '/../../includes/navbar.php';
 
 
         // --- FOTO UJIAN ---
-        $username = $user['username'];
         $name = $user['name'];
         $folderName = $name.'_'.$id;
         $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $folderName);
+        var_dump($dataset_dir_ujian);
+        die();
         $dataset_url_base = 'dataset_ujian/' . $folderName; // Pastikan folder ini bisa diakses lewat web
 
         if ($dataset_dir_ujian && is_dir($dataset_dir_ujian)) {

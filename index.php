@@ -1,14 +1,14 @@
 <?php
 session_start();
-require __DIR__ . '/config/app.php';
-require __DIR__ . '/config/database.php';
+require __DIR__ . '/config/app.php'; //Memulai sesi PHP
+require __DIR__ . '/config/database.php'; //configurasi DATABASE
 
 if (isset($_SESSION['user_id'])) {
   if ($_SESSION['role'] == "admin") {
-    header("Location: " . BASE_URL . "/modules/admin/index.php");
+    header("Location: " . BASE_URL . "/modules/admin/index.php");//jika login admin maka ke halaman admin
     exit();
   }
-  header("Location: " . BASE_URL . "/modules/user/index.php");
+  header("Location: " . BASE_URL . "/modules/user/index.php"); // jika login user maka ke halaman user
   exit();
 }
 
@@ -71,14 +71,12 @@ require __DIR__ . '/includes/header.php';
         <button type="submit" class="btn btn-secondary login-btn form-control">Login</button>
         <br />
         <p id="register">No Account?<span style="color:#ffb300; text-decoration:none;" class="switch-form-link-register" onclick="showRegistrationForm()"> Register Here.</span></p>
-        <p>Open exam results <a href="<?= BASE_URL; ?>/decrypt-form.php" style="color:#ffb300;text-decoration:none;">Here.</a></p>
+        <!-- <p>Open exam results <a href="<?= BASE_URL; ?>/decrypt-form.php" style="color:#ffb300;text-decoration:none;">Here.</a></p> -->
 
       </form>
     </div>
 
   </div>
-
-  <!-- TESTING GIT AE BROO -->
 
   <!-- Registration Area -->
   <div class="registration-form" id="registrationForm">
@@ -124,7 +122,7 @@ require __DIR__ . '/includes/header.php';
         <div id="multiple-images" class="d-flex flex-wrap gap-3 justify-content-center mt-3"></div>
       </div>
 
-      <!-- Hidden Input Base64 -->
+      
       <div class="d-none">
         <input type="file" name="capturedImage1" id="img1">
         <input type="file" name="capturedImage2" id="img2">
@@ -254,17 +252,27 @@ require __DIR__ . '/includes/header.php';
     }
 
     async function retakeImage(index) {
-      const webcam = document.getElementById("webcam");
-      webcam.style.display = "block";
-      await delayCountdown(index);
-      const base64 = await captureValidatedImage(webcam, index);
-      if (!base64) {
-        alert("Wajah tidak terdeteksi. Ulangi lagi.");
-        return;
-      }
-      document.getElementById("img" + index).value = base64;
-      renderPreview(base64, index);
-    }
+  const webcam = document.getElementById("webcam");
+  webcam.style.display = "block";
+  await delayCountdown(index);
+
+  const file = await captureValidatedImage(webcam, index); // hasil blob jadi file
+  if (!file) {
+    alert("Wajah tidak terdeteksi. Ulangi lagi.");
+    return;
+  }
+
+  // ✅ Ganti isi input file dengan file baru
+  const inputFile = document.getElementById("img" + index);
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  inputFile.files = dataTransfer.files;
+
+  // ✅ Tampilkan preview ulang
+  const url = URL.createObjectURL(file);
+  renderPreview(url, index);
+}
+
   </script>
 
 
