@@ -15,6 +15,7 @@ $imageData = $data['image'];
 $username = preg_replace('/[^a-zA-Z0-9_]/', '', $data['username']); // sanitize nama folder
 $name = preg_replace('/[^a-zA-Z0-9_]/', '', $data['name']); // sanitize nama folder
 $id = preg_replace('/[^a-zA-Z0-9_]/', '', $data['id']); // sanitize nama folder
+$soal = preg_replace('/[^a-zA-Z0-9_]/', '', $data['soal']); // sanitize nama folder
 $folderName = $name.'_'.$id;
 
 
@@ -30,6 +31,8 @@ if (!file_exists($folder)) {
 $existingFiles = glob("$folder/*.png");
 $fileCount = count($existingFiles) + 1;
 
+
+
 // Bersihkan header base64 (jika ada)
 $base64Str = preg_replace('#^data:image/\w+;base64,#i', '', $imageData);
 
@@ -42,12 +45,26 @@ if ($imageDecoded === false) {
 }
 
 // Tentukan path file
-$filePath = "$folder/{$name}_$fileCount.png";
+$filePath = "$folder/{$name}_$soal.png";
+$countSoal = count(glob(dirname($filePath)));
 
-
-// Simpan file
-if (file_put_contents($filePath, $imageDecoded)) {
-    echo json_encode(["success" => true, "file" => $filePath]);
-} else {
-    echo json_encode(["success" => false, "message" => "Gagal menyimpan gambar."]);
+if($countSoal > 0)
+{
+    @unlink($filePath);
+    if (file_put_contents($filePath, $imageDecoded)) {
+        echo json_encode(["success" => true, "file" => $filePath]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Gagal menyimpan gambar."]);
+    }
 }
+else
+{
+    if (file_put_contents($filePath, $imageDecoded)) {
+        echo json_encode(["success" => true, "file" => $filePath]);
+    } else {
+        echo json_encode(["success" => false, "message" => "Gagal menyimpan gambar."]);
+    }
+}
+
+
+

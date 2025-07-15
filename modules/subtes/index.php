@@ -115,9 +115,28 @@ require __DIR__ . '/../../includes/navbar.php';
             </div>
 
 
+            <!-- Modal Konfirmasi Selesai Tes -->
+
+
         </div>
     </div>
-
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"  aria-labelledby="confirmationModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi</h5>
+        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button> -->
+      </div>
+      <div class="modal-body">
+        Apakah Anda yakin ingin menyelesaikan tes ini?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        <button type="button" class="btn btn-success" id="submitBtn">Ya, Selesaikan</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <?php
     require __DIR__ . '/../../includes/footer.php';
@@ -330,6 +349,8 @@ require __DIR__ . '/../../includes/navbar.php';
                     console.log("bisa klik next nih");
                     console.log('soal now :', currentSoal);
 
+                    const soal = currentSoal;
+
                     overlayText.innerText = "✅ Halo, " + currentName;
                     overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
                     overlayText.style.display = "block";
@@ -387,6 +408,7 @@ require __DIR__ . '/../../includes/navbar.php';
                                 username: currentUserName,
                                 name: currentName,
                                 id: currentUserId,
+                                soal:soal,
                             })
                         });
 
@@ -414,24 +436,38 @@ require __DIR__ . '/../../includes/navbar.php';
             }
 
             if (finishBtn) {
-                finishBtn.addEventListener("click", () => {
-                    saveAnswer(() => {
-                        $('#confirmationModal').modal('show');
-                    });
-                });
-                cancelBtn.addEventListener("click", () => {
-                    saveAnswer(() => {
-                        $('#confirmationModal').modal('close');
-                    });
-                });
+                // finishBtn.addEventListener("click", () => {
+                //     saveAnswer(() => {
+                //         const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                //         modal.show();
+
+                //     });
+                // });
+
+                // cancelBtn.addEventListener("click", () => {
+                    
+                //     console.log('masuk brooo');
+                //          // ✅ ini yang benar di Bootstrap 5
+                //         // Ambil elemen modal
+                //         const modalEl = document.getElementById('confirmationModal');
+
+                //         // Ambil instance modal dari Bootstrap
+                //         const modalInstance = bootstrap.Modal.getInstance(modalEl);
+
+                //         // Kalau belum ada instance, buat baru:
+                //         const modal = modalInstance || new bootstrap.Modal(modalEl);
+
+                //         // Sembunyikan modal
+                //         modal.close();
+                // });
+
                 // Tombol di dalam modal konfirmasi
                 submitBtn.addEventListener('click', function() {
                     $.ajax({
                         url: "<?= BASE_URL ?>/modules/subtes/finish.php",
                         type: "POST",
                         success: function(response) {
-                            console.log("Tes selesai:", response);
-                            window.location.href = "<?= BASE_URL ?>/modules/user/home.php";
+                            window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
                         },
                         error: function(xhr) {
                             console.error(xhr);
