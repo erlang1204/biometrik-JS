@@ -436,13 +436,10 @@ require __DIR__ . '/../../includes/navbar.php';
             }
 
             if (finishBtn) {
-                // finishBtn.addEventListener("click", () => {
-                //     saveAnswer(() => {
-                //         const modal = new bootstrap.Modal(document.getElementById('confirmationModal'));
-                //         modal.show();
-
-                //     });
-                // });
+                finishBtn.addEventListener("click", () => {
+                    saveAnswer(() => {
+                    });
+                });
 
                 // cancelBtn.addEventListener("click", () => {
 
