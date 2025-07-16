@@ -178,7 +178,8 @@ require __DIR__ . '/../../includes/navbar.php';
 
         // --- FOTO UJIAN ---
         $name = $user['name'];
-        $folderName = $name.'_'.$id;
+        $cleanName = str_replace(' ', '', $name); // hilangkan spas
+        $folderName = $cleanName.'_'.$id;
         $dataset_dir_ujian = realpath(__DIR__ . '/../../dataset_ujian/' . $folderName);
       
         $dataset_url_base = 'dataset_ujian/' . $folderName; // Pastikan folder ini bisa diakses lewat web

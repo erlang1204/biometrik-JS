@@ -120,23 +120,23 @@ require __DIR__ . '/../../includes/navbar.php';
 
         </div>
     </div>
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog"  aria-labelledby="confirmationModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi</h5>
-        <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button> -->
-      </div>
-      <div class="modal-body">
-        Apakah Anda yakin ingin menyelesaikan tes ini?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-        <button type="button" class="btn btn-success" id="submitBtn">Ya, Selesaikan</button>
-      </div>
+    <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi</h5>
+                    <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button> -->
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menyelesaikan tes ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="submitBtn">Ya, Selesaikan</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
 
     <?php
     require __DIR__ . '/../../includes/footer.php';
@@ -351,8 +351,8 @@ require __DIR__ . '/../../includes/navbar.php';
 
                     const soal = currentSoal;
 
-                    overlayText.innerText = "✅ Halo, " + currentName;
-                    overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+                    // overlayText.innerText = "✅ Halo, " + currentName;
+                    // overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
                     overlayText.style.display = "block";
 
                     // const canvasSnapshot = document.createElement("canvas");
@@ -408,7 +408,7 @@ require __DIR__ . '/../../includes/navbar.php';
                                 username: currentUserName,
                                 name: currentName,
                                 id: currentUserId,
-                                soal:soal,
+                                soal: soal,
                             })
                         });
 
@@ -445,7 +445,7 @@ require __DIR__ . '/../../includes/navbar.php';
                 // });
 
                 // cancelBtn.addEventListener("click", () => {
-                    
+
                 //     console.log('masuk brooo');
                 //          // ✅ ini yang benar di Bootstrap 5
                 //         // Ambil elemen modal
@@ -462,7 +462,41 @@ require __DIR__ . '/../../includes/navbar.php';
                 // });
 
                 // Tombol di dalam modal konfirmasi
-                submitBtn.addEventListener('click', function() {
+                submitBtn.addEventListener('click', async function() {
+                    const soal = currentSoal;
+                    try {
+                        const canvasSnapshot = await html2canvas(videoContainer, {
+                            backgroundColor: null, // agar transparan
+                            useCORS: true // jika ada elemen gambar dari domain lain
+                        });
+
+                        const imageBase64 = await canvasSnapshot.toDataURL("image/png");
+
+                        // Kirim ke backend
+                        const response = await fetch("save_snapshot.php", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                image: imageBase64,
+                                username: currentUserName,
+                                name: currentName,
+                                id: currentUserId,
+                                soal: soal,
+                            })
+                        });
+
+                        const result = await response.json();
+                        console.log(result);
+                        if (result.success) {
+                            console.log("✅ Gambar berhasil disimpan.");
+                        } else {
+                            console.error("❌ Gagal menyimpan gambar.");
+                        }
+                    } catch (error) {
+                        console.error("Terjadi kesalahan saat mengambil snapshot:", error);
+                    }
                     $.ajax({
                         url: "<?= BASE_URL ?>/modules/subtes/finish.php",
                         type: "POST",
@@ -489,7 +523,12 @@ require __DIR__ . '/../../includes/navbar.php';
 
 
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
+        let wajahTidakDikenaliCounter = 0;
+        const maxGagal = 3;
+
         let webcamStarted = false;
         const currentUserName = "<?= $currentUserName ?>";
         const currentName = "<?= $currentName ?>";
@@ -563,8 +602,8 @@ require __DIR__ . '/../../includes/navbar.php';
                 for (let i = 1; i <= 5; i++) {
                     try {
                         const img = await faceapi.fetchImage(
-    `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
-);
+                            `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
+                        );
 
                         const detection = await faceapi
                             .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
@@ -611,13 +650,10 @@ require __DIR__ . '/../../includes/navbar.php';
 
                 results.forEach((result, i) => {
                     const box = resizedDetections[i].detection.box;
-
-                    // Hitung persentase kecocokan
                     const distance = result.distance;
                     const similarity = Math.max(0, 1 - distance);
                     const percentage = Math.round(similarity * 100);
 
-                    // Tampilkan label dengan persen
                     const labelWithPercent = `${result.label} (${percentage}%)`;
                     const drawBox = new faceapi.draw.DrawBox(box, {
                         label: labelWithPercent
@@ -625,51 +661,85 @@ require __DIR__ . '/../../includes/navbar.php';
                     drawBox.draw(canvas);
 
                     if (result.label === "unknown" || percentage < 50) {
-    overlayText.innerText = `❌ Wajah Tidak Dikenali (${percentage}%)`;
-    overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
-    showWarningNotification("Wajah Anda tidak dikenali. Pastikan Anda menghadap kamera dengan jelas.");
-                    } else {
-    overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
-    overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
-}
+                        overlayText.innerText = `❌ Wajah Tidak Dikenali (${percentage}%)`;
+                        overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
 
+                        wajahTidakDikenaliCounter++;
+
+                        // Gantikan console.warn dengan swal toast warning
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'warning',
+                            title: `❌ Wajah tidak dikenali (Percobaan ${wajahTidakDikenaliCounter} dari ${maxGagal})`,
+                            showConfirmButton: false,
+                            timer: 5000
+                        });
+
+                        if (wajahTidakDikenaliCounter >= maxGagal) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Verifikasi Gagal',
+                                text: '🚫 Verifikasi wajah gagal 3 kali. Tes dihentikan.',
+                                confirmButtonText: 'Kembali ke Beranda'
+                            }).then(() => {
+                                $.ajax({
+                                    url: "<?= BASE_URL ?>/modules/subtes/finish.php",
+                                    type: "POST",
+                                    success: function(response) {
+                                        window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+                                    },
+                                    error: function(xhr) {
+                                        console.error(xhr);
+                                        alert('Gagal menyelesaikan tes.');
+                                    }
+                                });
+                                // window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+                            });
+                        }
+                    } else {
+                        overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
+                        overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+                    }
                 });
 
                 if (results.length === 0) {
                     overlayText.innerText = "Tidak ada wajah terdeteksi";
                     overlayText.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+                    // showWarningNotification("Tidak ada wajah terdeteksi. Pastikan menghadap kamera dengan jelas.");
+                    alert("Tidak ada wajah terdeteksi. Pastikan menghadap kamera dengan jelas.");
                 }
-            }, 1000);
+            }, 3000);
 
         });
     </script>
 
-<script>
-function showWarningNotification(message) {
-    // Cegah notifikasi spam berulang
-    if (document.getElementById("warning-toast")) return;
+    <script>
+        function showWarningNotification(message) {
+            // Cegah notifikasi spam berulang
+            if (document.getElementById("warning-toast")) return;
 
-    const toast = document.createElement("div");
-    toast.id = "warning-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "20px";
-    toast.style.right = "20px";
-    toast.style.zIndex = "99999";
-    toast.style.backgroundColor = "#ffc107";
-    toast.style.color = "#000";
-    toast.style.padding = "1rem 1.5rem";
-    toast.style.borderRadius = "8px";
-    toast.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
-    toast.style.fontWeight = "bold";
-    toast.innerText = message;
+            const toast = document.createElement("div");
+            toast.id = "warning-toast";
+            toast.style.position = "fixed";
+            toast.style.bottom = "20px";
+            toast.style.right = "20px";
+            toast.style.zIndex = "99999";
+            toast.style.backgroundColor = "#ffc107";
+            toast.style.color = "#000";
+            toast.style.padding = "1rem 1.5rem";
+            toast.style.borderRadius = "8px";
+            toast.style.boxShadow = "0 0 10px rgba(0,0,0,0.2)";
+            toast.style.fontWeight = "bold";
+            toast.innerText = message;
 
-    document.body.appendChild(toast);
+            document.body.appendChild(toast);
 
-    setTimeout(() => {
-        toast.remove();
-    }, 5000); // 5 detik
-}
-</script>
+            setTimeout(() => {
+                toast.remove();
+            }, 5000); // 5 detik
+        }
+    </script>
 
 
     <script type="text/javascript">

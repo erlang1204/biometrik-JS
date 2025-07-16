@@ -107,6 +107,7 @@ $currentUserId = $_SESSION['user_id'];
     async function getLabeledFaceDescriptions() {
         const labeledDescriptors = [];
 
+
         // Ambil 5 gambar dari folder dataset user
         for (let i = 1; i <= 5; i++) {
             try {
@@ -131,8 +132,112 @@ $currentUserId = $_SESSION['user_id'];
         return labeledDescriptors;
     }
 
+    // document.addEventListener('DOMContentLoaded', async function() {
+    //     if (!webcamStarted) {
+    //         startWebcam();
+    //         webcamStarted = true;
+    //     }
+
+    //     const modelPath = "<?= BASE_URL ?>/models/";
+    //     await faceapi.nets.tinyFaceDetector.loadFromUri(modelPath);
+    //     await faceapi.nets.faceLandmark68Net.loadFromUri(modelPath);
+    //     await faceapi.nets.faceRecognitionNet.loadFromUri(modelPath);
+
+    //     async function getLabeledFaceDescriptions() {
+    //         const labeledDescriptors = [];
+    //         for (let i = 1; i <= 5; i++) {
+    //             try {
+    //                 const img = await faceapi.fetchImage(
+    //                     `${baseURL}/dataset/${currentName}_${currentUserId}/${currentName}_${i}.png`
+    //                 );
+
+    //                 const detection = await faceapi
+    //                     .detectSingleFace(img, new faceapi.TinyFaceDetectorOptions())
+    //                     .withFaceLandmarks()
+    //                     .withFaceDescriptor();
+
+    //                 if (detection) {
+    //                     labeledDescriptors.push(detection.descriptor);
+    //                 } else {
+    //                     console.log(`No face detected in ${i}.png`);
+    //                 }
+    //             } catch (error) {
+    //                 console.error(`Error processing ${i}.png:`, error);
+    //             }
+    //         }
+    //         return labeledDescriptors;
+    //     }
+
+    //     const labeledFaceDescriptors = await getLabeledFaceDescriptions();
+    //     const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+
+    //     const canvas = faceapi.createCanvasFromMedia(video);
+    //     canvas.setAttribute("id", "overlay");
+    //     document.querySelector(".video-wrapper").appendChild(canvas);
+
+    //     const displaySize = {
+    //         width: video.offsetWidth,
+    //         height: video.offsetHeight
+    //     };
+    //     faceapi.matchDimensions(canvas, displaySize);
+
+    //     let hasAlerted = false;
+
+    //     setInterval(async () => {
+    //         const detections = await faceapi
+    //             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+    //             .withFaceLandmarks()
+    //             .withFaceDescriptors();
+
+    //         const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    //         canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
+    //         const results = resizedDetections.map((d) => faceMatcher.findBestMatch(d.descriptor));
+
+    //         results.forEach((result, i) => {
+    //             const box = resizedDetections[i].detection.box;
+    //             const distance = result.distance;
+    //             const similarity = Math.max(0, 1 - distance);
+    //             const percentage = Math.round(similarity * 100);
+
+    //             const labelWithPercent = `${result.label} (${percentage}%)`;
+    //             const drawBox = new faceapi.draw.DrawBox(box, {
+    //                 label: labelWithPercent
+    //             });
+    //             drawBox.draw(canvas);
+
+    //             if (result.label === "unknown" || percentage < 50) {
+    //                 overlayText.innerText = `❌ Wajah Tidak Dikenali (${percentage}%)`;
+    //                 overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+
+
+    //                 wajahTidakDikenaliCounter++;
+    //                 console.warn("❌ Peringatan ke-", wajahTidakDikenaliCounter);
+
+    //                 if (wajahTidakDikenaliCounter >= maxGagal) {
+    //                     alert("🚫 Verifikasi wajah gagal 3 kali. Tes dihentikan.");
+    //                     window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+    //                 }
+    //             } else {
+    //                 overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
+    //                 overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+    //             }
+    //         });
+
+    //         if (results.length === 0) {
+    //             overlayText.innerText = "Tidak ada wajah terdeteksi";
+    //             overlayText.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+    //             showWarningNotification("Tidak ada wajah terdeteksi. Pastikan menghadap kamera dengan jelas.");
+    //         }
+    //     }, 3000);
+
+    // });
+
+
     function startWebcam() {
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.getUserMedia({
+                video: true
+            })
             .then((stream) => {
                 video.srcObject = stream;
                 videoContainer.style.display = "block";
@@ -163,38 +268,75 @@ $currentUserId = $_SESSION['user_id'];
 
             const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
 
-            if (results.length === 0) {
-                console.log(`❌ Gagal: Tidak ada wajah`);
-                overlayText.innerText = `❌ Tidak ada wajah terdeteksi`;
-                overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
-                failFlag = true;
-                break;
-            }
+            results.forEach((result, i) => {
+                const box = resizedDetections[i].detection.box;
+                const distance = result.distance;
+                const similarity = Math.max(0, 1 - distance);
+                const percentage = Math.round(similarity * 100);
 
-            if (results.length > 1) {
-                console.log(`❌ Gagal: Terdeteksi lebih dari 1 wajah`);
-                overlayText.innerText = `❌ Hanya 1 wajah yang diperbolehkan`;
-                overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
-                failFlag = true;
-                break;
-            }
+                const labelWithPercent = `${result.label} (${percentage}%)`;
+                const drawBox = new faceapi.draw.DrawBox(box, {
+                    label: labelWithPercent
+                });
+                drawBox.draw(canvas);
+                console.log(percentage,"t");
+                
 
-            const result = results[0];
-            const box = resizedDetections[0].detection.box;
-            new faceapi.draw.DrawBox(box, { label: result.label }).draw(canvas);
+                if (result.label === "unknown" || percentage < 30) {
+                    overlayText.innerText = `❌ Wajah Tidak Dikenali (${percentage}%)`;
+                    overlayText.style.backgroundColor = "rgba(255, 0, 0, 0.7)";
+                     failFlag = true;
+                
 
-            if (result.label === "unknown") {
-                console.log(`❌ Gagal: Wajah tidak dikenali`);
-                overlayText.innerText = `❌ Wajah tidak dikenali`;
-                overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
-                failFlag = true;
-                break;
-            } else {
-                console.log(`✅ Verifikasi ${attempt} sukses: ${result.label}`);
-                overlayText.innerText = `✅ Verifikasi ${attempt} berhasil`;
-                overlayText.style.backgroundColor = "rgba(0,128,0,0.7)";
-                successCount++;
-            }
+                    // wajahTidakDikenaliCounter++;
+                    // console.warn("❌ Peringatan ke-", wajahTidakDikenaliCounter);
+
+                    // if (wajahTidakDikenaliCounter >= maxGagal) {
+                    //     alert("🚫 Verifikasi wajah gagal 3 kali. Tes dihentikan.");
+                    //     window.location.href = "<?= BASE_URL ?>/modules/user/index.php";
+                    // }
+                } else {
+                    overlayText.innerText = `✅ Halo, ${currentName} (${percentage}%)`;
+                    overlayText.style.backgroundColor = "rgba(0, 128, 0, 0.7)";
+                    successCount++;
+                }
+            });
+
+
+            // if (results.length === 0) {
+            //     console.log(`❌ Gagal: Tidak ada wajah`);
+            //     overlayText.innerText = `❌ Tidak ada wajah terdeteksi`;
+            //     overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
+            //     failFlag = true;
+            //     break;
+            // }
+
+            // if (results.length > 1) {
+            //     console.log(`❌ Gagal: Terdeteksi lebih dari 1 wajah`);
+            //     overlayText.innerText = `❌ Hanya 1 wajah yang diperbolehkan`;
+            //     overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
+            //     failFlag = true;
+            //     break;
+            // }
+
+            // const result = results[0];
+            // const box = resizedDetections[0].detection.box;
+            // new faceapi.draw.DrawBox(box, {
+            //     label: result.label
+            // }).draw(canvas);
+
+            // if (result.label === "unknown") {
+            //     console.log(`❌ Gagal: Wajah tidak dikenali`);
+            //     overlayText.innerText = `❌ Wajah tidak dikenali`;
+            //     overlayText.style.backgroundColor = "rgba(255,0,0,0.7)";
+            //     failFlag = true;
+            //     break;
+            // } else {
+            //     console.log(`✅ Verifikasi ${attempt} sukses: ${result.label}`);
+            //     overlayText.innerText = `✅ Verifikasi ${attempt} berhasil`;
+            //     overlayText.style.backgroundColor = "rgba(0,128,0,0.7)";
+                
+            // }
 
             await new Promise(resolve => setTimeout(resolve, 1000)); // delay 1 detik
         }
@@ -234,7 +376,10 @@ $currentUserId = $_SESSION['user_id'];
         const canvas = faceapi.createCanvasFromMedia(video);
         canvas.id = "overlay";
         document.querySelector(".video-wrapper").appendChild(canvas);
-        const displaySize = { width: video.width, height: video.height };
+        const displaySize = {
+            width: video.width,
+            height: video.height
+        };
         faceapi.matchDimensions(canvas, displaySize);
 
         // Jalankan proses verifikasi 5x

@@ -69,7 +69,7 @@ require __DIR__ . '/../../includes/header.php';
             <h2 class="text-center">Verification OTP</h2>
             <p class="text-center">Please ask the admin for a verification code.</p>
             <form action="<?= BASE_URL; ?>/modules/auth/verification.php" method="POST">
-                <div type="hidden" class="form-group">
+                <div hidden class="form-group">
                     <label for="username">Username:</label>
                     <input type="text" class="form-control" id="username" name="username" value="<?= $_SESSION['username']; ?>">
                 </div>
