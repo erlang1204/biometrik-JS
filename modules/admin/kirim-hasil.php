@@ -153,11 +153,6 @@ function kirimHasilUser($data_user, $fileName)
                                         <td>:</td>
                                         <td>' . $contactNumber . '</td>
                                     </tr>
-                                    <tr>
-                                        <td>Password</td>
-                                        <td>:</td>
-                                        <td>' . $otp . '</td>
-                                    </tr>
                                 </table>
                             </body>
                         </html>';
